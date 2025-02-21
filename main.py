@@ -106,7 +106,8 @@ async def entrypoint(ctx: JobContext):
             vad=ctx.proc.userdata["vad"],
             stt=deepgram.STT(),
             llm=openai.LLM(
-                base_url=f"{letta_endpoint}/openai/v1",
+                # base_url=f"{letta_endpoint}/openai/v1",
+                base_url=f"{letta_endpoint}/openai/v1/fast",
                 api_key=letta_token,
                 model="gpt-4o-mini",
                 user=agent_id,
