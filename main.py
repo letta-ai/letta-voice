@@ -24,6 +24,7 @@ load_dotenv()
 # Get environment variables
 agent_id = os.getenv("LETTA_AGENT_ID")
 letta_endpoint = os.getenv("LETTA_BASE_URL")
+letta_token = os.getenv("LETTA_TOKEN")
 
 logger = logging.getLogger("voice-assistant")
 
@@ -106,6 +107,7 @@ async def entrypoint(ctx: JobContext):
             stt=deepgram.STT(),
             llm=openai.LLM(
                 base_url=f"{letta_endpoint}/openai/v1",
+                api_key=letta_token,
                 model="gpt-4o-mini",
                 user=agent_id,
             ),
