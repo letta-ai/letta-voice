@@ -22,8 +22,9 @@ from livekit.plugins import deepgram, openai, silero, cartesia
 load_dotenv()
 
 # Get environment variables
-agent_id = os.getenv('LETTA_AGENT_ID')
-ngrok_endpoint = os.getenv('NGROK_ENDPOINT')
+agent_id = os.getenv("LETTA_AGENT_ID")
+letta_endpoint = os.getenv("LETTA_BASE_URL")
+letta_token = os.getenv("LETTA_TOKEN")
 
 logger = logging.getLogger("voice-assistant")
 
@@ -99,15 +100,16 @@ async def entrypoint(ctx: JobContext):
     participant = await ctx.wait_for_participant()
     logger.info(f"Starting voice assistant for participant {participant.identity}")
 
-    if agent_id and ngrok_endpoint: 
+    if agent_id and letta_endpoint:
         print(f"Using Letta agent {agent_id}")
         agent = VoicePipelineAgent(
             vad=ctx.proc.userdata["vad"],
             stt=deepgram.STT(),
             llm=openai.LLM(
-                base_url=f"{ngrok_endpoint}/openai/v1",
+                base_url=f"{letta_endpoint}/openai/v1",
+                api_key=letta_token,
                 model="gpt-4o-mini",
-                user=agent_id
+                user=agent_id,
             ),
             tts=cartesia.TTS(),
             chat_ctx=initial_ctx,
@@ -118,9 +120,7 @@ async def entrypoint(ctx: JobContext):
             vad=ctx.proc.userdata["vad"],
             stt=deepgram.STT(),
             llm=openai.LLM(
-                # base_url="https://437c339b175e.ngrok.app/openai/v1",
                 model="gpt-4o-mini",
-                # user="agent-4958c5f7-d47e-447b-981b-3e8d2e2269cf"
             ),
             tts=cartesia.TTS(),
             chat_ctx=initial_ctx,
