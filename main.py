@@ -3,6 +3,8 @@ import logging
 
 import os
 from dotenv import load_dotenv
+
+from letta_client import Letta
 from livekit import rtc
 from livekit.agents import (
     AutoSubscribe,
@@ -27,6 +29,12 @@ letta_endpoint = os.getenv("LETTA_BASE_URL")
 letta_token = os.getenv("LETTA_TOKEN")
 
 logger = logging.getLogger("voice-assistant")
+
+
+if letta_token:
+    letta_client = Letta(base_url=letta_endpoint, token=letta_token)
+else:
+    letta_client = Letta(base_url=letta_endpoint)
 
 
 class LatencyTracker:
@@ -171,6 +179,14 @@ async def entrypoint(ctx: JobContext):
 
 
 if __name__ == "__main__":
+
+    # Check that the agent actually exists
+    agent_state = letta_client.agents.retrieve(agent_id=agent_id)
+    if not agent_state:
+        raise ValueError(f"Agent with ID {agent_id} does not exist on the Letta server at {letta_endpoint}.")
+    else:
+        print(f"Agent {agent_id} exists on the Letta server at {letta_endpoint}, proceeding...")
+
     cli.run_app(
         WorkerOptions(
             entrypoint_fnc=entrypoint,

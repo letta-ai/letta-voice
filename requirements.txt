@@ -1,3 +1,4 @@
+letta-client
 livekit-agents
 livekit-plugins-openai
 livekit-plugins-deepgram
