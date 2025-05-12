@@ -105,10 +105,9 @@ async def entrypoint(ctx: JobContext):
             vad=ctx.proc.userdata["vad"],
             stt=deepgram.STT(),
             llm=openai.LLM(
-                # base_url=f"{ngrok_endpoint}/v1/voice",
-                base_url=f"https://82a15f78ee62.ngrok.app/v1/voice-beta/agent-7aa8fb84-8901-4b59-9d4c-6e7cdd1ee8c0",
-                # base_url=f"https://beta-api.letta.com/v1/voice",
-                model="gpt-4o-mini",
+                # base_url=f"https://823f-104-193-170-185.ngrok-free.app/v1/voice-beta/agent-7785e566-9ad8-4f32-84bb-3d9c36262446",
+                base_url=os.getenv("LETTA_ENDPOINT") + "/v1/voice-beta/" + os.getenv("LETTA_AGENT_ID"),
+                model=os.getenv("OPENAI_MODEL"),
                 # api_key="MTNjYjFkOTctYWViNS00NzU3LTk5YzAtM2M5ZmEzY2U1NTUwOmJlZjMwZjk3LWJmNzMtNGRlNS1iY2U2LTQzMDMxMjM3NWI5Mg==",
                 # user="agent-5a26c642-323f-46a6-902b-3dbf37b83c18"
                 # user=agent_id
@@ -123,7 +122,7 @@ async def entrypoint(ctx: JobContext):
             stt=deepgram.STT(),
             llm=openai.LLM(
                 # base_url="https://437c339b175e.ngrok.app/openai/v1",
-                model="gpt-4o-mini",
+                model=os.getenv("OPENAI_MODEL"),
                 # user="agent-4958c5f7-d47e-447b-981b-3e8d2e2269cf"
             ),
             tts=cartesia.TTS(),
