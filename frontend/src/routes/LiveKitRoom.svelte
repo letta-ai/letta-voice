@@ -30,6 +30,13 @@
     for (const segment of segments) {
       transcriptions[segment.id] = segment;
     }
+
+    tick().then(() => {
+      const container = document.getElementById("transcription-container");
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    });
   }
 
   function handleTrackSubscribed(
@@ -121,11 +128,11 @@
   });
 </script>
 
-<div class="">
+<div class="p-4 w-full">
   <div
-    class="flex justify-center items-center h-full w-full border border-gray-200 p-15"
+    class="flex justify-center max-w-[800px] mx-auto rounded-lg card items-center h-full w-full border border-gray-200 p-15 bg-gray-50"
   >
-    <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-4 justify-center flex-wrap">
       <div
         class="relative w-[300px] h-[300px] flex justify-center items-center"
       >
@@ -161,14 +168,14 @@
             }
           }}
         >
-          {#if !connected}
+          <!-- {#if !connected}
             <div
               class="absolute inset-0 bg-black/50 hover:bg-black/25 rounded-full flex items-center justify-center text-white font-small"
             >
               Start a conversation
             </div>
-          {/if}
-          <div class="w-30 h-30">
+          {/if} -->
+          <div class="w-30 h-30 p-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 41 40"
@@ -191,16 +198,25 @@
           ></div>
         {/if}
       </div>
-      <div class="flex-1 overflow-y-auto max-h-80 w-[400px] ml-25">
+      <div
+        class="flex-1 overflow-y-auto max-h-80 min-w-[300px] max-w-[400px] ml-5 text-gray-500"
+        id="transcription-container"
+      >
         {#if Object.keys(transcriptions).length === 0}
-          <div class="p-4 text-gray-500">
+          <div>
             Welcome to the Letta Voice demo. Tap on the orb to connect, then
             speak to see transcriptions appear here.
           </div>
         {/if}
         <ul>
-          {#each Object.values(transcriptions).sort((a, b) => a.firstReceivedTime - b.firstReceivedTime) as segment (segment.id)}
-            <li>{segment.text}</li>
+          {#each Object.values(transcriptions).sort((a, b) => a.firstReceivedTime - b.firstReceivedTime) as segment, index (segment.id)}
+            <li
+              class={index === Object.values(transcriptions).length - 1
+                ? "font-bold text-black"
+                : ""}
+            >
+              {segment.text}
+            </li>
           {/each}
         </ul>
       </div>

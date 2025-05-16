@@ -6,6 +6,7 @@
 
 body {
     font-family: var(--font-sans);
+    background-color: #f4f4fb;
 }
 
 html, body {
@@ -26,6 +27,7 @@ body {
     position: relative;
     padding-inline: calc(var(--spacing) * 10);
     padding-block: calc(var(--spacing) * 10);
+    transition: all 0.3s ease-in-out;
 }
 
 .letta-ball:hover {
@@ -43,14 +45,18 @@ body {
     top: 50px;
     left: 50px;
     z-index: 1;
-    -webkit-animation: glowing 0.5s ease-in-out infinite alternate;
-    -moz-animation: glowing 0.5s ease-in-out infinite alternate;
-    animation: glowing 0.5s ease-in-out infinite alternate;
+    -webkit-animation: glowing 1s ease-in-out infinite alternate;
+    -moz-animation: glowing 1s ease-in-out infinite alternate;
+    animation: glowing 1s ease-in-out infinite alternate;
 }
 
 .shake-vertical {
 	-webkit-animation: shake-vertical 13s ease-in-out infinite;
 	animation: shake-vertical 13s ease-in-out infinite;
+}
+
+.card {
+  box-shadow: 5px 5px 90px 10px rgba(182, 182, 182, 0.1), -0px 0px 20px 10px rgba(182, 182, 182, 0.1);
 }
 
 
