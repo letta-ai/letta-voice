@@ -1,5 +1,5 @@
 import { LettaClient } from "@letta-ai/letta-client";
-import type { Block } from "@letta-ai/letta-client/api";
+import type { Block, Passage } from "@letta-ai/letta-client/api";
 import { json } from "@sveltejs/kit";
 
 export async function GET() {
@@ -23,7 +23,7 @@ export async function GET() {
   const agent = await client.agents.retrieve(agentId);
   const memory = agent.memory.blocks;
 
-  const formattedMemory = memory.map((block: Block) => {
+  const formattedCoreMemory = memory.map((block: Block) => {
     if (!block.label) {
       return;
     }
@@ -34,5 +34,11 @@ export async function GET() {
 
   const archivalMemory = await client.agents.passages.list(agentId);
 
-  return json({ core: formattedMemory, archival: archivalMemory });
+  const formattedArchivalMemory = archivalMemory.map((passage: Passage) => {
+    return {
+      [passage.createdAt!.toISOString()]: passage.text,
+    };
+  });
+
+  return json({ core: formattedCoreMemory, archival: formattedArchivalMemory });
 }

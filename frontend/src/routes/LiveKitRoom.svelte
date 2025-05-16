@@ -93,9 +93,6 @@
 
       const coreMemoryResponse = await fetch("api/getMemory");
       memory = await coreMemoryResponse.json();
-      console.log(memory);
-      const coreMemory = memory?.core;
-      console.log(coreMemory);
 
       room = new Room();
       if (!token) {
@@ -142,13 +139,13 @@
   });
 </script>
 
-<div class="p-4 w-full">
+<div class="p-4 w-full text-gray-600">
   <div
     class="flex flex-wrap justify-center max-w-[800px] mx-auto rounded-lg card items-center h-full w-full border border-gray-200 p-15 bg-gray-50"
   >
     <div class="flex items-center space-x-4 justify-center flex-wrap">
       <div
-        class="w-[300px] h-[300px] flex justify-center items-center"
+        class="relative w-[300px] h-[300px] flex justify-center items-center"
         id="button-container"
       >
         <button
@@ -220,8 +217,8 @@
           {#each Object.values(transcriptions).sort((a, b) => a.firstReceivedTime - b.firstReceivedTime) as segment, index (segment.id)}
             <li
               class={index === Object.values(transcriptions).length - 1
-                ? "font-bold text-black"
-                : "text-gray-300"}
+                ? `${connected ? "font-bold text-black" : ""}`
+                : `${connected ? "text-gray-300" : ""}`}
             >
               {segment.text}
             </li>
@@ -233,12 +230,12 @@
   <div class="flex items-center justify-center" id="memory-container">
     <div class="flex flex-col w-full max-w-[800px]">
       <button
-        class="flex items-center space-x-2 mb-2 text-gray-600 hover:text-gray-900 focus:outline-none"
+        class="flex items-center space-x-2 mb-2 hover:text-gray-400 transition-all duration-300 cursor-pointer focus:outline-none"
         on:click={() => (isMemoryExpanded = !isMemoryExpanded)}
         aria-expanded={isMemoryExpanded}
       >
         <svg
-          class="w-5 h-5 transition-transform duration-300"
+          class="w-5 h-5 transition-transform duration-700"
           class:rotate-180={isMemoryExpanded}
           fill="none"
           stroke="currentColor"
@@ -258,7 +255,7 @@
       {#if memory}
         {#if isMemoryExpanded}
           <div
-            transition:slide={{ duration: 500 }}
+            transition:slide={{ duration: 700 }}
             class="p-4 rounded-lg bg-gray-50 overflow-hidden card"
           >
             <h4 class="text-sm font-medium uppercase mb-2">Core Memory</h4>
@@ -280,12 +277,26 @@
               Archival Memory
             </h4>
             {#each memory.archival as item}
-              {#each Object.entries(item || {}) as [key, value]}
-                <div>
-                  <strong>{key}</strong>:
-                  <span class="whitespace-pre-line">{value}</span>
-                </div>
-              {/each}
+              <div class="text-sm text-gray-700">
+                {#each Object.entries(item || {}) as [key, value]}
+                  <div class="py-2">
+                    <strong
+                      >Memory at {new Date(key).toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}</strong
+                    >
+                  </div>
+                  <div class="flex">
+                    <div class="w-1 bg-gray-300 mr-2"></div>
+                    <span class="whitespace-pre-line">{value}</span>
+                  </div>
+                {/each}
+              </div>
             {/each}
           </div>
         {/if}
