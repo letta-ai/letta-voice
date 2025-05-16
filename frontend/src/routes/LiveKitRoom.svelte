@@ -12,8 +12,15 @@
     TrackPublication,
     type TranscriptionSegment,
   } from "livekit-client";
+  import type { Passage } from "@letta-ai/letta-client/api";
+  import { slide } from "svelte/transition";
 
   let token: { value: string; wsURL: string } | null = null;
+  let memory: {
+    core: { label: string; value: string }[];
+    archival: Passage[];
+  } | null = null;
+
   let room: Room;
   let audioElements: Map<string, HTMLAudioElement> = new Map();
   let connected = false;
@@ -21,6 +28,7 @@
 
   let buttonShouldBounce = true;
   let showGlow = false;
+  let isMemoryExpanded = false;
 
   function handleTranscriptionReceived(
     segments: TranscriptionSegment[],
@@ -80,8 +88,14 @@
   onMount(async () => {
     try {
       // Fetch token from your SvelteKit API endpoint
-      const response = await fetch("/api/getToken");
-      token = await response.json();
+      const tokenResponse = await fetch("/api/getToken");
+      token = await tokenResponse.json();
+
+      const coreMemoryResponse = await fetch("api/getMemory");
+      memory = await coreMemoryResponse.json();
+      console.log(memory);
+      const coreMemory = memory?.core;
+      console.log(coreMemory);
 
       room = new Room();
       if (!token) {
@@ -130,11 +144,12 @@
 
 <div class="p-4 w-full">
   <div
-    class="flex justify-center max-w-[800px] mx-auto rounded-lg card items-center h-full w-full border border-gray-200 p-15 bg-gray-50"
+    class="flex flex-wrap justify-center max-w-[800px] mx-auto rounded-lg card items-center h-full w-full border border-gray-200 p-15 bg-gray-50"
   >
     <div class="flex items-center space-x-4 justify-center flex-wrap">
       <div
-        class="relative w-[300px] h-[300px] flex justify-center items-center"
+        class="w-[300px] h-[300px] flex justify-center items-center"
+        id="button-container"
       >
         <button
           class={`letta-ball relative
@@ -168,13 +183,6 @@
             }
           }}
         >
-          <!-- {#if !connected}
-            <div
-              class="absolute inset-0 bg-black/50 hover:bg-black/25 rounded-full flex items-center justify-center text-white font-small"
-            >
-              Start a conversation
-            </div>
-          {/if} -->
           <div class="w-30 h-30 p-5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -213,13 +221,77 @@
             <li
               class={index === Object.values(transcriptions).length - 1
                 ? "font-bold text-black"
-                : ""}
+                : "text-gray-300"}
             >
               {segment.text}
             </li>
           {/each}
         </ul>
       </div>
+    </div>
+  </div>
+  <div class="flex items-center justify-center" id="memory-container">
+    <div class="flex flex-col w-full max-w-[800px]">
+      <button
+        class="flex items-center space-x-2 mb-2 text-gray-600 hover:text-gray-900 focus:outline-none"
+        on:click={() => (isMemoryExpanded = !isMemoryExpanded)}
+        aria-expanded={isMemoryExpanded}
+      >
+        <svg
+          class="w-5 h-5 transition-transform duration-300"
+          class:rotate-180={isMemoryExpanded}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+        <h3 class="text-md font-medium">
+          {isMemoryExpanded ? "Hide" : "Show"} Memory
+        </h3>
+      </button>
+      {#if memory}
+        {#if isMemoryExpanded}
+          <div
+            transition:slide={{ duration: 500 }}
+            class="p-4 rounded-lg bg-gray-50 overflow-hidden card"
+          >
+            <h4 class="text-sm font-medium uppercase mb-2">Core Memory</h4>
+            {#each memory.core as item}
+              <div class="text-sm text-gray-700">
+                {#each Object.entries(item || {}) as [key, value]}
+                  <div class="py-2">
+                    <strong>{key}</strong>
+                  </div>
+                  <div class="flex">
+                    <div class="w-1 bg-gray-300 mr-2"></div>
+                    <span class="whitespace-pre-line">{value}</span>
+                  </div>
+                {/each}
+              </div>
+            {/each}
+
+            <h4 class="text-sm font-medium uppercase mb-2 pt-8">
+              Archival Memory
+            </h4>
+            {#each memory.archival as item}
+              {#each Object.entries(item || {}) as [key, value]}
+                <div>
+                  <strong>{key}</strong>:
+                  <span class="whitespace-pre-line">{value}</span>
+                </div>
+              {/each}
+            {/each}
+          </div>
+        {/if}
+      {:else}
+        <div class="text-gray-500">Loading memory...</div>
+      {/if}
     </div>
   </div>
 </div>

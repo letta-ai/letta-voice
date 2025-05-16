@@ -38,6 +38,7 @@
 		"vitest": "^3.0.0"
 	},
 	"dependencies": {
+		"@letta-ai/letta-client": "^0.1.121",
 		"livekit-server-sdk": "^2.13.0"
 	}
 }
