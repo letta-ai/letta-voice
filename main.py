@@ -22,8 +22,8 @@ from openai import api_key
 load_dotenv()
 
 # Get environment variables
-agent_id = os.getenv('LETTA_AGENT_ID')
-ngrok_endpoint = os.getenv('LETTA_ENDPOINT')
+letta_agent_id = os.getenv('LETTA_AGENT_ID')
+letta_endpoint = os.getenv('LETTA_ENDPOINT')
 
 logger = logging.getLogger("voice-assistant")
 
@@ -99,14 +99,14 @@ async def entrypoint(ctx: JobContext):
     participant = await ctx.wait_for_participant()
     logger.info(f"Starting voice assistant for participant {participant.identity}")
 
-    if agent_id and ngrok_endpoint: 
-        print(f"Using Letta agent {agent_id}")
+    if letta_agent_id and letta_endpoint: 
+        print(f"Using Letta agent {letta_agent_id}")
         agent = VoicePipelineAgent(
             vad=ctx.proc.userdata["vad"],
             stt=deepgram.STT(),
             llm=openai.LLM(
                 # base_url=f"https://823f-104-193-170-185.ngrok-free.app/v1/voice-beta/agent-7785e566-9ad8-4f32-84bb-3d9c36262446",
-                base_url=os.getenv("LETTA_ENDPOINT") + "/v1/voice-beta/" + os.getenv("LETTA_AGENT_ID"),
+                base_url=letta_endpoint + "/v1/voice-beta/" + letta_agent_id,
                 model=os.getenv("OPENAI_MODEL"),
                 # api_key="MTNjYjFkOTctYWViNS00NzU3LTk5YzAtM2M5ZmEzY2U1NTUwOmJlZjMwZjk3LWJmNzMtNGRlNS1iY2U2LTQzMDMxMjM3NWI5Mg==",
                 # user="agent-5a26c642-323f-46a6-902b-3dbf37b83c18"
